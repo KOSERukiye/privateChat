@@ -1,4 +1,4 @@
-package multiclientserveur;
+package univ_lorraine.iut.java.privatechat.ClientServeur;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
