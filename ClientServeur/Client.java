@@ -1,43 +1,57 @@
-package multiclientserveur;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
+import javax.crypto.*;
+import javax.crypto.spec.*;
+import java.security.*;
+import java.math.*;
 
 public class Client {
+    public static void main(String[] args) {
+        try {
+            // 1. Création d'un socket client et initialisation des flux
+            InetAddress host = InetAddress.getLocalHost();
+            Socket socket = new Socket(host.getHostName(), 9876);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-    public static void main(String[] args)
-            throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException {
-        // get the localhost IP address, if server is running on some other IP, you need
-        // to use that
-        InetAddress host = InetAddress.getLocalHost();
-        Socket socket = null;
-        ObjectOutputStream oos = null;
-        ObjectInputStream ois = null;
+            // 2. Génération de la paire de clés Diffie-Hellman
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("DH");
+            kpg.initialize(1024);
+            KeyPair kp = kpg.generateKeyPair();
+            Key publicKey = kp.getPublic();
+            Key privateKey = kp.getPrivate();
 
-        // establish socket connection to server
-        socket = new Socket(host.getHostName(), 9876);
-        // write to socket using ObjectOutputStream
-        oos = new ObjectOutputStream(socket.getOutputStream());
-        System.out.println("Sending request to Socket Server");
+            // 3. Envoi de la clé publique au serveur
+            out.writeObject(publicKey);
+            out.flush();
 
-        oos.writeObject("Ping");
-        oos.flush();
-        // read the server response message
-        ois = new ObjectInputStream(socket.getInputStream());
-        String message = (String) ois.readObject();
-        System.out.println("Message: " + message);
+            // 4. Réception de la clé publique du serveur
+            Key serverPublicKey = (Key)in.readObject();
 
-        oos.writeObject("Test 2");
-        oos.flush();
+            // 5. Génération de la clé secrète partagée
+            KeyAgreement ka = KeyAgreement.getInstance("DH");
+            ka.init(privateKey);
+            ka.doPhase(serverPublicKey, true);
+            byte[] secret = ka.generateSecret();
 
-        // close resources
-        ois.close();
-        oos.close();
-        Thread.sleep(2000);
+            // 6. Création d'un objet Cipher pour chiffrer les messages avec la clé secrète partagée
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secret, "AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
 
+            // 7. Envoi des messages chiffrés au serveur
+            String message = "Bonjour";
+            byte[] encrypted = cipher.doFinal(message.getBytes());
+            out.writeObject(encrypted);
+            out.flush();
+
+            // 8. Fermeture des flux et du socket
+            out.close();
+            in.close();
+            socket.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
