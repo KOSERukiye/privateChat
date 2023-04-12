@@ -7,30 +7,34 @@ import univ_lorraine.iut.java.privatechat.App;
 
 public class LoginController {
 
+
+
     @FXML
     TextField txtusername;
     @FXML
     TextField txtpassword;
     @FXML
     private void login() throws IOException {
-
-        if (txtusername.getText().isEmpty()) {
-            throw new IllegalArgumentException("Le champ username est vide");
+        boolean isValidUser = true;
+        boolean isValidPassword = true;
+        if (txtusername.getText().isEmpty() || txtusername.getText().length() < 6) {
+            txtusername.setStyle("-fx-border-color: red ; -fx-border-width: 2px ; -fx-border-radius: 5px ;");
+            isValidUser = false;
         }
-        if (txtusername.getText().length() < 6) {
-            throw new IllegalArgumentException("Le username doit contenir au moins 6 caractères");
-        }
-
-
-        if (txtpassword.getText().isEmpty()) {
-            throw new IllegalArgumentException("Le champ password est vide");
-        }
-        if (txtpassword.getText().length() < 8) {
-            throw new IllegalArgumentException("Le password doit contenir au moins 8 caractères");
+        if (txtpassword.getText().isEmpty() || txtpassword.getText().length() < 8) {
+            txtpassword.setStyle("-fx-border-color: red ; -fx-border-width: 2px ; -fx-border-radius: 5px ;");
+            isValidPassword = false;
         }
 
-        App.setRoot("chat");
+        if(isValidUser && isValidPassword){
+            App.setRoot("chat");
+        }
+
+
     }
+
+
+
 
 
 
