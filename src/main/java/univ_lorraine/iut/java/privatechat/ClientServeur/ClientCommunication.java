@@ -11,7 +11,7 @@ public class ClientCommunication implements Runnable {
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
 
-    public ClientCommunication(Socket socket) {
+    public ClientCommunication(Socket socket, byte[] sharedSecretKey) {
         super();
         this.socket = socket;
 

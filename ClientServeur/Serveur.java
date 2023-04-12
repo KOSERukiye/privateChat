@@ -77,7 +77,7 @@ public class Serveur {
 
                 // 8. Réception des messages chiffrés et déchiffrement avec la clé secrète partagée
                 while (true) {
-                    String message = (String)in.readObject();
+                    String message = (String) in.readObject();
                     if (message.equals("exit")) {
                         break;
                     }
@@ -89,3 +89,4 @@ public class Serveur {
                     // 9. Chiffrement de la réponse avec la clé secrète partagée et envoi au client
                     String responseMessage = "Serveur: J'ai bien reçu votre message!";
                     byte[] responseBytes
+                }

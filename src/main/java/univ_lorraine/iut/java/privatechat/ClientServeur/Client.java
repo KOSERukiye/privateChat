@@ -1,3 +1,5 @@
+package univ_lorraine.iut.java.privatechat.ClientServeur;
+
 import java.io.*;
 import java.net.*;
 import javax.crypto.*;
