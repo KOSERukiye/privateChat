@@ -27,7 +27,7 @@ public class LoginController {
         }
 
         if(isValidUser && isValidPassword){
-            App.setRoot("chat");
+            App.setRoot("Chat");
         }
 
 
